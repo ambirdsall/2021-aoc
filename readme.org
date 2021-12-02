@@ -2055,6 +2055,7 @@ end)
 
 #+RESULTS:
 : 1150
+
 * Day 2 :: Piloting the sub
 ** data
 #+begin_html
@@ -3127,6 +3128,7 @@ commands = [
 #+begin_html
 </details>
 #+end_html
+
 ** pt 1 :: depth and distance
 #+begin_src elixir :session pilot
 %{ distance: distance, depth: depth} = commands
