@@ -1,6 +1,10 @@
 * Day 1 :: Depth Chart
 ** data
-#+name: depths-list
+#+begin_html
+<details>
+  <summary>Click to see raw data</summary>
+#+end_html
+
 #+begin_src elixir :session depths
 depth_readings = [182,
  188,
@@ -2011,6 +2015,9 @@ depth_readings = [182,
 :  308, 309, 317, 326, 328, 316, 318, 333, 330, 293, 292, 294, 321, 313, 307, 301, 
 :  296, 291, ...]
 
+#+begin_html
+</details>
+#+end_html
 ** pt 1 :: depth deltas
 #+begin_src elixir :session depths
 depth_readings
@@ -2050,6 +2057,11 @@ end)
 : 1150
 * Day 2 :: Piloting the sub
 ** data
+#+begin_html
+<details>
+  <summary>Click to see raw data</summary>
+#+end_html
+
 #+begin_src elixir :session pilot
 commands = [
   {"forward", 7},
@@ -3112,6 +3124,9 @@ commands = [
 ]
 #+end_example
 
+#+begin_html
+</details>
+#+end_html
 ** pt 1 :: depth and distance
 #+begin_src elixir :session pilot
 %{ distance: distance, depth: depth} = commands
