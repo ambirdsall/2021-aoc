@@ -4208,10 +4208,10 @@ digits = [
 #+begin_src elixir :session bin
 zeros_and_ones = digits
 |> Enum.map(fn (n) ->  Enum.map(String.codepoints(n), &String.to_integer/1) end)
-  #+end_src
+#+end_src
 
-  #+RESULTS:
-  #+begin_example
+#+RESULTS:
+#+begin_example
   [
     [0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1],
     [1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0],
@@ -4265,7 +4265,7 @@ zeros_and_ones = digits
     [...],
     ...
   ]
-  #+end_example
+#+end_example
 
 ** pt 1 :: power consumption
 *** helpers
@@ -4279,12 +4279,6 @@ defmodule AOC.Diagnostics do
   end
 end
 #+end_src
-
-#+RESULTS:
-: {:module, AOC.Diagnostics,
-:  <<70, 79, 82, 49, 0, 0, 6, 208, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 240,
-:    0, 0, 0, 22, 22, 69, 108, 105, 120, 105, 114, 46, 65, 79, 67, 46, 68, 105,
-:    97, 103, 110, 111, 115, 116, 105, 99, 115, ...>>, {:to_decimal, 1}}
 
 *** solution
 #+begin_src elixir :session bin
@@ -4314,41 +4308,38 @@ gamma_rate * epsilon_rate
 *** helpers
 #+begin_src elixir :session bin
 defmodule AOC.LifeSupport do
-  def filter_by_most_common_bits(numbers), do: winnow(numbers, 1)
-  def filter_by_least_common_bits(numbers), do: winnow(numbers, 0)
+  def filter_by_most_common_bits(numbers), do: winnow(numbers, :most_common)
+  def filter_by_least_common_bits(numbers), do: winnow(numbers, :least_common)
 
-  defp winnow(numbers, dominant_digit) do
-    filter = filter_digit_for_index(numbers, 0, dominant_digit)
-    winnow_by(numbers, filter, 0, dominant_digit)
+  defp winnow(numbers, strategy) do
+    filter = filter_digit_for_index(numbers, 0, strategy)
+    winnow_by(numbers, filter, 0, strategy)
   end
 
-  defp winnow_by([number], _filter, _index, _dominant_digit) do
-    number
-  end
+  defp winnow_by([number], _filter, _index, _dominant_digit), do: number
 
-  defp winnow_by(numbers, filter, index, dominant_digit) do
+  defp winnow_by(numbers, filter, index, strategy) do
     keepers = numbers
     |> Enum.group_by(&(Enum.at(&1, index)))
     |> Map.get(filter)
 
     next_filter = keepers
-    |> filter_digit_for_index(index + 1, dominant_digit)
+    |> filter_digit_for_index(index + 1, strategy)
 
-    winnow_by(keepers, next_filter, index + 1, dominant_digit)
+    winnow_by(keepers, next_filter, index + 1, strategy)
   end
 
   # if there is only one number, it will be returned by the next call, so the filter doesn't matter one whit
-  defp filter_digit_for_index([_number], _index, 1), do: 0
+  defp filter_digit_for_index([_number], _index, _strategy), do: 0
 
-  defp filter_digit_for_index(numbers, index, 1) do
-
+  defp filter_digit_for_index(numbers, index, :most_common) do
     numbers
     |> Enum.map(&(Enum.at(&1, index)))
     |> Enum.sum()
     |> then(&(if &1 >= (length(numbers) / 2), do: 1, else: 0))
   end
 
-  defp filter_digit_for_index(numbers, index, 0) do
+  defp filter_digit_for_index(numbers, index, :least_common) do
     numbers
     |> Enum.map(&(Enum.at(&1, index)))
     |> Enum.sum()
@@ -4356,16 +4347,6 @@ defmodule AOC.LifeSupport do
   end
 end
 #+end_src
-
-#+RESULTS:
-: [33mwarning: [0mredefining module AOC.LifeSupport (current version defined in memory)
-:   iex:2
-:
-: {:module, AOC.LifeSupport,
-:  <<70, 79, 82, 49, 0, 0, 13, 16, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 1, 188,
-:    0, 0, 0, 32, 22, 69, 108, 105, 120, 105, 114, 46, 65, 79, 67, 46, 76, 105,
-:    102, 101, 83, 117, 112, 112, 111, 114, 116, ...>>,
-:  {:filter_digit_for_index, 3}}
 
 *** solution
 #+begin_src elixir :session bin
