@@ -4308,29 +4308,26 @@ gamma_rate * epsilon_rate
 *** helpers
 #+begin_src elixir :session bin
 defmodule AOC.LifeSupport do
-  def filter_by_most_common_bits(numbers), do: winnow(numbers, :most_common)
-  def filter_by_least_common_bits(numbers), do: winnow(numbers, :least_common)
-
-  defp winnow(numbers, strategy) do
+  def winnow_by(numbers, strategy) do
     filter = filter_digit_for_index(numbers, 0, strategy)
     winnow_by(numbers, filter, 0, strategy)
   end
 
-  defp winnow_by([number], _filter, _index, _dominant_digit), do: number
+  # hooray, we found it
+  defp winnow_by([number], _, _, _), do: number
 
   defp winnow_by(numbers, filter, index, strategy) do
     keepers = numbers
     |> Enum.group_by(&(Enum.at(&1, index)))
     |> Map.get(filter)
 
-    next_filter = keepers
-    |> filter_digit_for_index(index + 1, strategy)
+    next_index = index + 1
+    next_filter = filter_digit_for_index(keepers, next_index, strategy)
 
-    winnow_by(keepers, next_filter, index + 1, strategy)
+    winnow_by(keepers, next_filter, next_index, strategy)
   end
 
-  # if there is only one number, it will be returned by the next call, so the filter doesn't matter one whit
-  defp filter_digit_for_index([_number], _index, _strategy), do: 0
+  defp filter_digit_for_index([_], _, _), do: :eureka!
 
   defp filter_digit_for_index(numbers, index, :most_common) do
     numbers
@@ -4351,11 +4348,11 @@ end
 *** solution
 #+begin_src elixir :session bin
 oxygen_generator_rating = zeros_and_ones
-|> AOC.LifeSupport.filter_by_most_common_bits
+|> AOC.LifeSupport.winnow_by(:most_common_bits)
 |> AOC.Diagnostics.to_decimal()
 
 co2_scrubber_rating = zeros_and_ones
-|> AOC.LifeSupport.filter_by_least_common_bits
+|> AOC.LifeSupport.winnow_by(:least_common_bits)
 |> AOC.Diagnostics.to_decimal()
 
 oxygen_generator_rating * co2_scrubber_rating
