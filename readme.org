@@ -5333,17 +5333,24 @@ cards = [
 #+begin_html
 </details>
 #+end_html
-** pt 1 :: who won the bingo game
+** the bingo engine
 #+begin_src elixir :session bingo
 defmodule Bingo do
-  def winning_card_and_call(cards, calls) do
+  def first_winning_card_and_call(cards, calls) do
     [call | next_calls] = calls
-
     results = Enum.map(cards, &(apply_number(&1, call)))
-
     case Enum.find(results, &winner?/1) do
-      nil -> winning_card_and_call(results, next_calls)
+      nil -> first_winning_card_and_call(results, next_calls)
       winner -> {winner, call}
+    end
+  end
+
+  def last_winning_card_and_call(cards, calls) do
+    [call | next_calls] = calls
+    results = Enum.map(cards, &(apply_number(&1, call)))
+    case Enum.filter(results, &(!winner?(&1))) do
+      [last_at_the_party] -> first_winning_card_and_call([last_at_the_party], next_calls)
+      remaining_cards -> last_winning_card_and_call(remaining_cards, next_calls)
     end
   end
 
@@ -5382,8 +5389,17 @@ defmodule Bingo do
     end)
   end
 end
+#+end_src
 
-{board, call} = Bingo.winning_card_and_call(cards, calls)
+#+RESULTS:
+: {:module, Bingo,
+:  <<70, 79, 82, 49, 0, 0, 18, 180, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 1, 235,
+:    0, 0, 0, 35, 12, 69, 108, 105, 120, 105, 114, 46, 66, 105, 110, 103, 111, 8,
+:    95, 95, 105, 110, 102, 111, 95, 95, 10, ...>>, {:apply_number, 2}}
+
+** pt 1 :: who won the bingo game first
+#+begin_src elixir :session bingo
+{board, call} = Bingo.first_winning_card_and_call(cards, calls)
 sum_of_unmarked_numbers = board
 |> Enum.reduce(0, fn
   (row, sum) -> Enum.reduce(row, sum, fn
@@ -5397,3 +5413,20 @@ sum_of_unmarked_numbers * call
 
 #+RESULTS:
 : 2496
+
+** pt 1 :: who won the bingo game last
+#+begin_src elixir :session bingo
+{board, call} = Bingo.last_winning_card_and_call(cards, calls)
+sum_of_unmarked_numbers = board
+|> Enum.reduce(0, fn
+  (row, sum) -> Enum.reduce(row, sum, fn
+    {n, false}, sum -> sum + n
+    _, sum -> sum
+  end)
+end)
+
+sum_of_unmarked_numbers * call
+#+end_src
+
+#+RESULTS:
+: 25925
